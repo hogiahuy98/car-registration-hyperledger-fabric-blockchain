@@ -3,19 +3,22 @@ test:
     description: test benchmark
     workers:
       type: local
-      number: 2
+      number: 5
     rounds:
-      - label: 10tx/s
-        description: Đăng ký xe benchmark
+      - label: fixed-load
+        description: Truy vấn xe
         txDuration: 30
         rateControl: 
-          type: fixed-rate
+          type: maximum-rate
           opts:
-            tps: 10
+            tps: 300
+            step: 5
+            sampleInterval: 10
+            includeFailed: true
         workload:
-          module: workload/carRegistration.js
+          module: workload/queryCar.js
           arguments:
-            assets: 10
+            assets: 15
             contractId: CRChaincode
 monitors:
   resource:
@@ -24,11 +27,6 @@ monitors:
       interval: 5 
       containers:
       - all
-    charting:
-      bar:
-        metrics: [CPU%(max)]
-      polar:
-        metrics: [all]
   - module: process
     options:
       interval: 3

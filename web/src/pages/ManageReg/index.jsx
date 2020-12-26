@@ -101,7 +101,6 @@ export default () => {
             title: 'Mã đăng ký',
             dataIndex: 'id',
             key: 'id',
-            ellipsis: true
         },
         {
             title: 'Biển số',
@@ -161,12 +160,12 @@ export default () => {
                     <Button
                         type="default"
                         onClick={() => history.push('/police/read-registration/' + record.id)}
+                        style={{width:100}}
                     >
                         <SelectOutlined />
                     </Button>
                 );
             },
-            ellipsis: true
         },
         {
             title: null,

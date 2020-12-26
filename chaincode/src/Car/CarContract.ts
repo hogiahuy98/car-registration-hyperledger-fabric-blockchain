@@ -2,6 +2,7 @@ import { Contract ,Context } from 'fabric-contract-api';
 import { Car, TransferDeal } from './Car';
 import { User } from '../User/User';
 import cars from './cars';
+import { City, District } from './city';
 
 
 const DOCTYPE = 'car';
@@ -43,29 +44,34 @@ export class CarContract extends Contract {
     }
 
     public async createRegistration(ctx: Context, ...params: string[]): Promise<string>{
-        const car: Car = {
-            id: params[0],
-            registrationNumber: PENDING_REGISTRATION_NUMBER,
-            engineNumber: params[1],
-            chassisNumber: params[2],
-            brand: params[3],
-            model: params[4],
-            color: params[5],
-            year: params[6],
-            capality: params[7],
-            owner: params[8], //userID
-            registrationState: REGISTRATION_STATE.PENDING,
-            createTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
-            modifyTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
-            modifyType: 0,
-            modifyUser: this.getUserId(ctx),
-            docType: DOCTYPE,
-        };
-        await ctx.stub.putState(car.id, Buffer.from(JSON.stringify(car)));
-        return JSON.stringify({
-            TxID: ctx.stub.getTxID(),
-            regId: car.id,
-        })
+        try {
+            const car: Car = {
+                id: params[0],
+                registrationNumber: PENDING_REGISTRATION_NUMBER,
+                engineNumber: params[1],
+                chassisNumber: params[2],
+                brand: params[3],
+                model: params[4],
+                color: params[5],
+                year: params[6],
+                capality: params[7],
+                owner: params[8], //userID
+                registrationState: REGISTRATION_STATE.PENDING,
+                createTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
+                modifyTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
+                modifyType: 0,
+                modifyUser: this.getUserId(ctx),
+                docType: DOCTYPE,
+            };
+            await ctx.stub.putState(car.id, Buffer.from(JSON.stringify(car)));
+            return JSON.stringify({
+                TxID: ctx.stub.getTxID(),
+                regId: car.id,
+            })
+        } catch (error) {
+            console.log(error);
+            return "";
+        }
     }
 
     public async updateRegistration(ctx: Context, carId: string, payload: string){
@@ -121,6 +127,10 @@ export class CarContract extends Contract {
         return ctx.stub.getTxID();
     }
 
+    public async deleteCar(ctx: Context, carId) {
+        await ctx.stub.deleteState(carId)
+    }
+
     public async queryAllCars(ctx: Context) {
         const queryString: any = { };
         queryString.selector = {
@@ -132,13 +142,19 @@ export class CarContract extends Contract {
 
 
     public async queryCarById(ctx: Context, carId: string) {
-        const queryString: any = { };
-        queryString.selector = {
-            docType: DOCTYPE,
-            id: carId
-        };
-        const queryResult = await this.getQueryResultForQueryString(ctx, JSON.stringify(queryString));
-        return JSON.parse(queryResult)[0];
+        try {
+            const queryString: any = { };
+            queryString.selector = {
+                docType: DOCTYPE,
+                id: carId
+            };
+            queryString.use_index = ['_design/indexIdDoc', 'indexId']
+            const queryResult = await this.getQueryResultForQueryString(ctx, JSON.stringify(queryString));
+            return JSON.parse(queryResult)[0];
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 
 
@@ -357,4 +373,99 @@ export class CarContract extends Contract {
         return result;
     }
 
+    public async createUser(ctx: Context, userAsString: string) {
+        console.log('START========CREATE-USER===========');
+        const user: User = JSON.parse(userAsString);
+        user.verified = user.verifyPolice ? true : false;
+        user.createTime = new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString();
+        user.updateTime = new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString();
+        await ctx.stub.putState(user.id, Buffer.from(JSON.stringify(user)));
+        console.log("END========CREATE-USER===========");
+    }
+
+    public async verifyUser(ctx: Context, userId: string) {
+        const policeId = this.getUserId(ctx);
+        const userAsBytes = await ctx.stub.getState(userId);
+        const user: User = JSON.parse(userAsBytes.toString());
+        user.verified = true;
+        user.verifyPolice = policeId;
+        user.updateTime = new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString();
+        await ctx.stub.putState(user.id, Buffer.from(JSON.stringify(user)));
+        return ctx.stub.getTxID();
+    }
+
+    public async changePassword(ctx: Context, userId: string, newPassword: string) {
+        const userAsBytes = await ctx.stub.getState(userId);
+        const user: User = JSON.parse(userAsBytes.toString());
+        user.password = newPassword;
+        await ctx.stub.putState(user.id, Buffer.from(JSON.stringify(user)));
+        return ctx.stub.getTxID();
+    }
+
+    public async updateUser(ctx: Context, userAsString: string){
+        console.log("======START=UPDATE=USER=======");
+        const payload: User = JSON.parse(userAsString);
+        const userAsBytes: Uint8Array= await ctx.stub.getState(payload.id);
+        if (!userAsBytes || userAsBytes.length === 0){
+            throw new Error('wrong UID');
+        }
+        const currentUser: User = JSON.parse(userAsBytes.toString());
+        const modifyUser: User = {...currentUser, ...payload};
+        modifyUser.updateTime = new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString();
+        await ctx.stub.putState(modifyUser.id, Buffer.from(JSON.stringify(modifyUser)));
+        return ctx.stub.getTxID();
+    }
+
+
+    public async readUserByUID(ctx: Context, key: string): Promise<string> {
+        const userAsBytes = await ctx.stub.getState(key);
+        if (!userAsBytes || userAsBytes.length === 0) {
+            throw new Error(`Cannot find any user has ${key} key`);
+        }
+        return userAsBytes.toString();
+    }
+
+
+    public async queryUserByPhoneNumber(ctx: Context, phoneNumber: string): Promise<string>{
+        const queryString: any = {};
+        queryString.selector = {};
+        queryString.selector.phoneNumber = phoneNumber;
+        const queryResult = await this.getQueryResultForQueryString(ctx, JSON.stringify(queryString));   
+        return queryResult;
+    }
+
+    public async addCity(ctx: Context, payload: string) {
+        try {
+            const city: City = JSON.parse(payload);
+            city.currentSeries = 0;
+            city.docType = "city";
+            await ctx.stub.putState(city.id, Buffer.from(JSON.stringify(city)));
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+
+    public async updateCity(ctx: Context, payload: string) {
+        try {
+            const city: District = JSON.parse(payload);
+            await ctx.stub.putState(city.id, Buffer.from(JSON.stringify(city)));
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    public async switchSeri(ctx: Context, cityId: string) {
+        try {
+            const city: City = JSON.parse((await ctx.stub.getState(cityId)).toString());
+            city.currentSeries++;
+            await ctx.stub.putState(city.id, Buffer.from(JSON.stringify(city)));
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }

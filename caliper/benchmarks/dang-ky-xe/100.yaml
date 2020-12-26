@@ -3,11 +3,11 @@ test:
     description: test benchmark
     workers:
       type: local
-      number: 2
+      number: 3
     rounds:
-      - label: 100tx/s
+      - label: 100tps
         description: Đăng ký xe benchmark
-        txDuration: 30
+        txNumber: 1000
         rateControl: 
           type: fixed-rate
           opts:
@@ -24,11 +24,6 @@ monitors:
       interval: 5 
       containers:
       - all
-    charting:
-      bar:
-        metrics: [Memory(avg), CPU%(avg)]
-      polar:
-        metrics: [all]
   - module: process
     options:
       interval: 3

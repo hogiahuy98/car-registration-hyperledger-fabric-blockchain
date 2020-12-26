@@ -1,5 +1,5 @@
 import React, {useEffect, useContext} from 'react';
-import { Card, Table, Space, Button, Modal, Typography } from 'antd';
+import { Card, Table, Space, Button, Modal, Typography, Result } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useState } from 'react';
 import { DEFAULT_HOST } from '@/host'
@@ -101,22 +101,29 @@ export default () => {
     }, [detailVisible])
 
     return (
-        <PageContainer>
-            <Card >
-                <Table style={{minHeight: '400px'}} loading={tableLoading} columns={columns} dataSource={cars}>
-
-                </Table>
+        <PageContainer loading={tableLoading}>
+            <Card>
+                {cars.length ? (
+                    <Table
+                        style={{ minHeight: '400px' }}
+                        loading={tableLoading}
+                        columns={columns}
+                        dataSource={cars}
+                    ></Table>
+                ) : (
+                    <Result status="404" title="Bạn chưa đăng ký xe!"></Result>
+                )}
             </Card>
             <Modal
                 centered
                 visible={detailVisible}
                 onCancel={() => setDetailVisible(false)}
-                maskClosable={false}    
-                footer={null}              
+                maskClosable={false}
+                footer={null}
                 width={'800px'}
             >
-                <CarDetail car={car}/>
+                <CarDetail car={car} />
             </Modal>
         </PageContainer>
-    )
+    );
 }

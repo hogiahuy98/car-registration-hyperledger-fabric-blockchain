@@ -176,7 +176,7 @@ export class UserContract extends Contract {
         };
 
         await ctx.stub.putState(police.id, Buffer.from(JSON.stringify(police)));
-        await ctx.stub.putState(user.id, Buffer.from(JSON.stringify(user)));
+        await ctx.stub.putState(user.id,Buffer.from(JSON.stringify(user)));
     }
 
 

@@ -615,7 +615,7 @@ ledger:
     # stateDatabase - options are "goleveldb", "CouchDB"
     # goleveldb - default state database stored in goleveldb.
     # CouchDB - store state database in CouchDB
-    stateDatabase: goleveldb
+    stateDatabase: CouchDB
     # Limit on the number of records to return per query
     totalQueryLimit: 100000
     couchDBConfig:
@@ -643,7 +643,7 @@ ledger:
        # Note that chaincode queries are only bound by totalQueryLimit.
        # Internally the chaincode may execute multiple CouchDB queries,
        # each of size internalQueryLimit.
-       internalQueryLimit: 1000
+       internalQueryLimit: 5000
        # Limit on the number of records per CouchDB bulk update batch
        maxBatchUpdateSize: 1000
        # Warm indexes after every N blocks.

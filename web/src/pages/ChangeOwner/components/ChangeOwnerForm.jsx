@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Form, Input, Select, Option, Spin, Button, Modal, Result, Divider, Typography, Space } from 'antd';
+import { Form, Input, Select, Option, Spin, Button, Modal, Result, Divider, Typography, Space, } from 'antd';
 import { DEFAULT_HOST } from '@/host';
 import axios from 'axios';
 
@@ -79,6 +79,7 @@ export default () => {
                         setOptions(opts);
                         setInitLoading(false);
                     } else {
+                        console.log("Không có dữ liệu")
                         setSelectLoading(false);
                         setInitLoading(false);
                     }
@@ -161,7 +162,11 @@ export default () => {
                 <Select
                     loading={selectLoading}
                     options={options}
-                    notFoundContent={<Spin style={{ marginInline: '45%' }} spinning={true}></Spin>}
+                    notFoundContent={
+                        <Result status='404' title="Bạn chưa đăng ký xe!">
+
+                        </Result>
+                    }
                     disabled={isPending}
                 ></Select>
             </Form.Item>

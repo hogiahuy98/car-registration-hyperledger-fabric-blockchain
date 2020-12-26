@@ -1,7 +1,7 @@
 import { getCarContract } from './CommonFuntion';
-import { Car } from './CarInterface';
+import { Car, City, District } from './CarInterface';
 import { nanoid } from 'nanoid';
-export { Car } from './CarInterface'
+export { Car, City, District } from './CarInterface'
 
 
 export async function registryCar(car: Car, phoneNumber: string) {
@@ -200,6 +200,17 @@ export async function getHistoryOfCar(phoneNumber: string, carId: string): Promi
         const resultsBuffer = await contract.evaluateTransaction('getHistory', carId);
         return JSON.parse(resultsBuffer.toString());
     } catch (error) {
+        throw error;
+    }
+}
+
+export async function addCity(userId: string, city: City) {
+    try {
+        const contract = await getCarContract(userId);
+        const resultsBuffer = await contract.submitTransaction('addCity', JSON.stringify(city));
+        return JSON.parse(resultsBuffer.toString());
+    } catch (error) {
+        console.log(error);
         throw error;
     }
 }

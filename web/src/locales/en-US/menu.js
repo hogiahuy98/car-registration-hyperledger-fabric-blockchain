@@ -59,5 +59,6 @@ export default {
   'menu.profile': "Thông tin cá nhân",
   'menu.help': 'Trợ giúp',
   'menu.manage-user': "Quản lí người dùng",
-  "menu.analysis":"Thống kê"
+  "menu.analysis":"Thống kê",
+  "menu.manage-city":"Quản lí tỉnh, thành"
 };

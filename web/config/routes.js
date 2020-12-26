@@ -47,13 +47,13 @@ export default [
             path: '/app/profile',
             component: './Profile'
           },
-          {
-            exact: true, 
-            name: "help",
-            icon: 'QuestionCircleOutlined',
-            path: '/app/help',
-            component: './RegisteredCar'
-          },
+          // {
+          //   exact: true, 
+          //   name: "help",
+          //   icon: 'QuestionCircleOutlined',
+          //   path: '/app/help',
+          //   component: './RegisteredCar'
+          // },
           // {
           //   name: 'list.table-list',
           //   icon: 'table',
@@ -100,13 +100,13 @@ export default [
             path: '/police/profile',
             component: './Profile'
           },
-          {
-            exact: true, 
-            name: "help",
-            icon: 'QuestionCircleOutlined',
-            path: '/police/help',
-            component: './RegisteredCar'
-          },
+          // {
+          //   exact: true, 
+          //   name: "help",
+          //   icon: 'QuestionCircleOutlined',
+          //   path: '/police/help',
+          //   component: './RegisteredCar'
+          // },
         ]
       },{
         path: '/admin',
@@ -125,10 +125,16 @@ export default [
           },
           {
             exact: true,
-            path: '/admin/analysis',
-            component: './Analysis',
-            name: 'analysis'
-          }
+            path: '/admin/manager-city',
+            component: './ManageCity',
+            name: 'manage-city'
+          },
+          // {
+          //   exact: true,
+          //   path: '/admin/analysis',
+          //   component: './Analysis',
+          //   name: 'analysis'
+          // }
         ]
       },
       {
