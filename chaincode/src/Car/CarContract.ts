@@ -55,7 +55,9 @@ export class CarContract extends Contract {
                 color: params[5],
                 year: params[6],
                 capality: params[7],
-                owner: params[8], //userID
+                owner: params[8],
+                registrationCity: params[9],
+                registrationDistrict: params[10],
                 registrationState: REGISTRATION_STATE.PENDING,
                 createTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
                 modifyTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
@@ -437,7 +439,6 @@ export class CarContract extends Contract {
     public async addCity(ctx: Context, payload: string) {
         try {
             const city: City = JSON.parse(payload);
-            city.currentSeries = 0;
             city.docType = "city";
             await ctx.stub.putState(city.id, Buffer.from(JSON.stringify(city)));
             return true;
@@ -459,11 +460,44 @@ export class CarContract extends Contract {
         }
     }
 
-    public async switchSeri(ctx: Context, cityId: string) {
+    public async addDistrict(ctx: Context, payload: string) {
         try {
-            const city: City = JSON.parse((await ctx.stub.getState(cityId)).toString());
-            city.currentSeries++;
-            await ctx.stub.putState(city.id, Buffer.from(JSON.stringify(city)));
+            const district: District = JSON.parse(payload);
+            district.docType = 'district';
+            await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    public async updateDistrict(ctx: Context, payload: string) {
+        try {
+            const district: District = JSON.parse(payload);
+            await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    public async switchSeri(ctx: Context, districtId: string) {
+        try {
+            const district: District = JSON.parse((await ctx.stub.getState(districtId)).toString());
+            district.seriesIndex++;
+            await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    public async switchNumber(ctx: Context, districtId: string) {
+        try {
+            const district: District = JSON.parse((await ctx.stub.getState(districtId)).toString());
+            district.numberIndex++;
+            await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
         } catch (error) {
             console.log(error)
         }

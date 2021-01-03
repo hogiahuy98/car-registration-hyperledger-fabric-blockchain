@@ -32,6 +32,8 @@ export default ({ registration, reload }) => {
         chassisNumber,
         createTime,
         id,
+        registrationCity,
+        registrationDistrict,
     } = registration;
     const user = fetchCurrentUser();
     const config = {
@@ -90,6 +92,12 @@ export default ({ registration, reload }) => {
                 </Descriptions.Item>
                 <Descriptions.Item label={label(REGISTRATION_FIELD.ENGINE_NUMBER.LABEL)}>
                     {engineNumber}
+                </Descriptions.Item>
+                <Descriptions.Item label={label("Tỉnh, thành đăng ký")}>
+                    {registrationCity?registrationCity.name: null}
+                </Descriptions.Item>
+                <Descriptions.Item label={label("Quận, huyện")}>
+                    {registrationDistrict?registrationDistrict.districtName : null}
                 </Descriptions.Item>
             </Descriptions>
             <Divider></Divider>

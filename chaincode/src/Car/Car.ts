@@ -9,6 +9,8 @@ export class Car {
     public capality: string;
     public owner: string;
     public year: string;
+    public registrationCity?: string;
+    public registrationDistrict?: string;
     public type?: string;
     public createTime?: string;
     public modifyTime?: string;

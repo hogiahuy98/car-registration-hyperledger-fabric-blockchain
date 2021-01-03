@@ -33,13 +33,13 @@ export default () => {
                     },
                 });
                 const pendingRegistration = response.data;
-                if (pendingRegistration.length === 0) {
+                if (pendingRegistration.length === 0 || pendingRegistration.error) {
                     setPending(false);
                     setSpin(false);
                 } else {
                     setSpin(false);
                     setPending(true);
-                    setRegistration(pendingRegistration[0].Record);
+                    setRegistration(pendingRegistration);
                 }
             } catch (error) {
                 setSpin(false);

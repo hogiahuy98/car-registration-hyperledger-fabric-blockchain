@@ -15,6 +15,8 @@ import {registryCar,
         confirmTransferDeal,
         rejectTransferDeal,
         Car,
+        getCity,
+        getDistrict,
 } from '../fabric/car/Car.fabric';
 import { nanoid } from 'nanoid';
 import { authentication } from '../middleware/auth.middleware';
@@ -37,6 +39,8 @@ router.post('/', authentication, async (req: Request, res: Response) => {
             chassisNumber: req.body.chassisNumber,
             engineNumber: req.body.engineNumber,
             capality: req.body.capality,
+            registrationCity: req.body.registrationCity,
+            registrationDistrict: req.body.registrationDistrict,
         }
         const registryResult = await registryCar(car, userId);
         return res.json({ ...registryResult });
@@ -173,6 +177,16 @@ router.get('/:id', authentication, async (req: Request, res: Response) => {
     res.json(result[0]);
 });
 
+const getCar = async (id: any) => {
+    const queryString: any = {};
+    queryString.selector = {
+        docType: 'car',
+        id: id
+    }
+    const result = await queryCars('admin', JSON.stringify(queryString));
+    return result[0].Record;
+}
+
 router.get('/:id/transferDeal', authentication, async (req: Request, res: Response) => {
     try {
         const queryString: any = {};
@@ -243,6 +257,12 @@ router.put('/:id/acceptRegistration/', authentication, async (req: Request, res:
         const id = req.user.id;
         let validNumber = false;
         let registrationNumber = "";
+        const car = await getCar(req.params.id);
+        console.log(car);
+        const city = await getCity(car.registrationCity);
+        const district = await getDistrict(car.registrationDistrict);
+        const prefix = city.number[district.numberIndex] + city.series[district.seriesIndex] + '-';
+        console.log(prefix)
         while (!validNumber){
             registrationNumber = randomstring.generate({
                 length: 5,
@@ -251,12 +271,12 @@ router.put('/:id/acceptRegistration/', authentication, async (req: Request, res:
             const queryString: any = {}
             queryString.selector = {
                 docType: 'car',
-                registrationNumber
+                registrationNumber: prefix + registrationNumber
             }
             const result = await queryCars(id, JSON.stringify(queryString));
             if(result.length === 0)  validNumber = true;
         }
-        const acceptRegistrationResult = await acceptCarRegistration(req.params.id, "65A-" + registrationNumber, id);
+        const acceptRegistrationResult = await acceptCarRegistration(req.params.id, prefix + registrationNumber, id);
         if (!acceptRegistrationResult.success) {
             return res.sendStatus(403);
         }

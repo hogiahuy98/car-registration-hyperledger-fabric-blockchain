@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { User, queryUser, modifyUser, verifyUser, changePassword } from '../fabric/user/User.fabric';
 import { authentication } from '../middleware/auth.middleware';
-import { queryCars } from '../fabric/car/Car.fabric';
+import { queryCars, getCity, getDistrict } from '../fabric/car/Car.fabric';
 import * as bcrypt from 'bcrypt';
 import { parse } from 'dotenv/types';
 
@@ -157,7 +157,10 @@ router.get('/:id/cars/pending', authentication, async (req: Request, res: Respon
             registrationState: 'pending'
         }
         const queryResult = await queryCars(req.user.id, JSON.stringify(queryString));
-        res.json(queryResult);
+        const car = queryResult[0].Record;
+        car.registrationCity = await getCity(car.registrationCity);
+        car.registrationDistrict = await getDistrict(car.registrationDistrict)
+        res.json(car);
     } catch (error) {
         console.log(error);
         res.send({error: true, msg: error.message});

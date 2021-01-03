@@ -9,11 +9,9 @@ export async function authentication(
 ): Promise<any> {
     try {
         const authHeader = req.headers["authorization"];
-        console.log(authHeader);
         const token = authHeader && authHeader.split(" ")[1];
         if (token == null) return res.sendStatus(401);
         const user: any = jwt.verify(token, process.env.JWT_SECRET as string);
-        console.log(user);
         const queryString: any = {};
         queryString.selector = {
             docType: "user",

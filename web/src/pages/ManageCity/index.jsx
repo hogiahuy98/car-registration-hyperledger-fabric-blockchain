@@ -12,13 +12,17 @@ import {
     Select,
     DatePicker,
     Space,
-    Modal
+    Modal,
+    Tag
 } from 'antd';
 import { useHistory } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import axios from 'axios';
 import moment from 'moment';
 import { PlusOutlined } from '@ant-design/icons';
+import {fetchCurrentUser} from '@/helpers/Auth'
+import { DEFAULT_HOST } from '@/host';
+
 
 moment.locale('en');
 
@@ -27,6 +31,61 @@ import CityForm from './components/CityForm';
 
 export default () => {
     const [formVisible, setFormVisible] = useState(false);
+    const [cityData, setCityData] = useState([]);
+    const [editCity, setEditCity] = useState({
+        visible: false,
+    });
+    const [tloading, setTloading] = useState(true);
+    const user = fetchCurrentUser();
+    const config = {
+        headers: {
+            Authorization: 'Bearer ' + user.token,
+        },
+    };
+
+    useEffect(() => {
+        const f = async () => {
+            const citys = await fetchCity();
+            setCityData(citys);
+            setTloading(false);
+        };
+        f();
+    }, [editCity, formVisible]);
+
+    const fetchCity = async () => {
+        try {
+            setTloading(true);
+            const url = DEFAULT_HOST + '/city';
+            const result = await axios.get(url, config);
+            return result.data;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const columns = [
+        {
+            title: 'Tên tỉnh, thành',
+            key: 'name',
+            dataIndex: 'name',
+        },
+        {
+            title: 'Số hiệu biển số',
+            key: 'number',
+            dataIndex: 'number',
+            render: (text, record) => {
+                return record.number.map((num) => {
+                    return <Tag>{num}</Tag>;
+                });
+            },
+        },
+        {
+            title: 'Chỉnh sửa',
+            render: (text, record) => {
+                return <Button type="link" onClick={() => setEditCity({visible: true, city: record})}>Chỉnh sửa</Button>;
+            },
+        },
+    ];
 
     return (
         <PageContainer>
@@ -64,10 +123,27 @@ export default () => {
                     </Col>
                 </Row>
                 <Divider></Divider>
-                <Table></Table>
+                <Table loading={tloading} dataSource={cityData} columns={columns}></Table>
             </Card>
-            <Modal title="Thêm tỉnh, thành phố" visible={formVisible} footer={null} onCancel={() => setFormVisible(false)}>
-                <CityForm />
+            <Modal
+                centered
+                title="Thêm tỉnh, thành phố"
+                visible={formVisible}
+                footer={null}
+                onCancel={() => setFormVisible(false)}
+                destroyOnClose
+            >
+                <CityForm disable={() => setFormVisible(false)} />
+            </Modal>
+            <Modal
+                centered
+                title="Chỉnh sửa tỉnh, thành phố"
+                visible={editCity.visible}
+                footer={null}
+                onCancel={() => setEditCity({ ...editCity, visible: false })}
+                destroyOnClose
+            >
+                <CityForm disable={()=> setEditCity(false)} edit={editCity.city} />
             </Modal>
         </PageContainer>
     );
