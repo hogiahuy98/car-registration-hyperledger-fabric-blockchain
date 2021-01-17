@@ -11,8 +11,8 @@ import { useEffect } from 'react';
 const { Step } = Steps;
 
 const step = {
-    check: 'Đăng kiểm',
-    generateNumber: 'Bấm số',
+    check: 'Kiểm tra xe',
+    generateNumber: 'Kiểm tra thông tin người đăng ký',
     complete: 'Hoàn thành',
 };
 

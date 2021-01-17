@@ -7,7 +7,7 @@ export { Car, City, District } from './CarInterface'
 export async function registryCar(car: Car, phoneNumber: string) {
     try {
         const contract = await getCarContract(phoneNumber);
-        const params: Array<string> = [
+        const params: Array<any> = [
             car.id,
             car.engineNumber,
             car.chassisNumber,
@@ -17,6 +17,8 @@ export async function registryCar(car: Car, phoneNumber: string) {
             car.year,
             car.capality,
             car.owner,
+            car.registrationCity,
+            car.registrationDistrict
         ]
         const result = await contract.submitTransaction('createRegistration', ...params);
         return { success: true, result: JSON.parse(result.toString()) };
@@ -134,7 +136,7 @@ export async function requestChangeOwner(carId: string,  newOwner: string, curre
     try {
         const contract = await getCarContract(currentOwner);
         const dealId = 'D' + nanoid().toUpperCase();
-        const TxIDByte = await contract.submitTransaction('createTransferDeal', dealId, carId, currentOwner, newOwner);
+        const TxIDByte = await contract.submitTransaction('createTransferOffer', dealId, carId, currentOwner, newOwner);
         const TxID = TxIDByte.toString();
         if( TxID !== "" || TxID.length !== 0) {
             return { success: true, result: { TxID: TxID } }
@@ -215,4 +217,55 @@ export async function addCity(userId: string, city: City) {
     }
 }
 
+export async function updateCity(userId: string, city: City) {
+    try {
+        const contract = await getCarContract(userId);
+        const resultsBuffer = await contract.submitTransaction('updateCity', JSON.stringify(city));
+        return JSON.parse(resultsBuffer.toString());
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
 
+export async function addDistrict(userId: string, district: District){
+    try {
+        const contract = await getCarContract(userId);
+        const resultsBuffer = await contract.submitTransaction('addDistrict', JSON.stringify(district));
+        console.log(resultsBuffer.toString());
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function updateDistrict(userId: string, district: District){
+    try {
+        const contract = await getCarContract(userId);
+        const resultsBuffer = await contract.submitTransaction('updateDistrict', JSON.stringify(district));
+        console.log(resultsBuffer.toString());
+    } catch (error) {
+        console.log(error);
+    }
+}
+export async function getCity(cityId: string) {
+    const queryString = {
+        selector: {
+            id: cityId,
+            docType: "city"
+        }
+    }
+    const result = await queryCars('admin', JSON.stringify(queryString));
+    console.log(result);
+    return result[0].Record;
+}
+
+export async function getDistrict(districtId: string) {
+    const queryString = {
+        selector: {
+            id: districtId,
+            docType: "district"
+        }
+    }
+    const result = await queryCars('admin', JSON.stringify(queryString));
+    return result[0].Record;
+}

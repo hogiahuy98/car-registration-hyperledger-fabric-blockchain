@@ -11,6 +11,12 @@ export default [
         component: './Landing'
       },
       {
+        exact: true,
+        name: 'landing',
+        path: '/index2',
+        component: './LandingAdmin'
+      },
+      {
         path: '/app',
         component: '../layouts/BasicLayout',
         wrappers: ['@/wrappers/Citizen'],

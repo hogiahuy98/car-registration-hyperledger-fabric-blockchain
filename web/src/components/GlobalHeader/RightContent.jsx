@@ -22,7 +22,9 @@ const GlobalHeaderRight = (props) => {
 
   const handleLogout = () => {
     logout();
-    history.push('/index');
+    if (user.role === 'citizen')
+      return history.push('/index');
+    else return history.push('/index2');
   }
 
   return (

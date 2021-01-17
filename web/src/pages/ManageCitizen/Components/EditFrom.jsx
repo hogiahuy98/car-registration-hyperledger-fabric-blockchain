@@ -62,7 +62,7 @@ export default ({defaultValue, onCancel}) => {
         setCurrent({
             ...defaultValue,
             dateOfIdentity: moment(defaultValue.dateOfIdentity, 'DD-MM-YYYY'),
-            dateOfBirth: moment(defaultValue.dateOfBirth),
+            dateOfBirth: moment(defaultValue.dateOfBirth, 'DD-MM-YYYY'),
             isConverted: true,
         });
     }, [defaultValue]);
@@ -126,7 +126,7 @@ export default ({defaultValue, onCancel}) => {
                 label="Họ và tên"
                 rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
             >
-                <Input placeholder="Nguyễn Văn A ..." disabled={posting || !edit.isEditing}></Input>
+                <Input placeholder="Nguyễn Văn A ..." readOnly={posting || !edit.isEditing}></Input>
             </Form.Item>
             <Form.Item
                 name="phoneNumber"
@@ -146,7 +146,7 @@ export default ({defaultValue, onCancel}) => {
                     },
                 ]}
             >
-                <Input placeholder="0942...." disabled={posting || !edit.isEditing}></Input>
+                <Input placeholder="0942...." readOnly={posting || !edit.isEditing}></Input>
             </Form.Item>
             <Form.Item
                 name="email"
@@ -164,7 +164,7 @@ export default ({defaultValue, onCancel}) => {
             >
                 <Input
                     placeholder="abcxyz@gmail.com......"
-                    disabled={posting || !edit.isEditing}
+                    readOnly={posting || !edit.isEditing}
                 ></Input>
             </Form.Item>
             <Form.Item
@@ -172,7 +172,7 @@ export default ({defaultValue, onCancel}) => {
                 label="Ngày sinh"
                 rules={[{ required: true, message: 'Vui lòng nhập ngày' }]}
             >
-                <DatePicker disabled={posting || !edit.isEditing} locale={locale}></DatePicker>
+                <DatePicker allowClear={false} readOnly={posting || !edit.isEditing} locale={locale}></DatePicker>
             </Form.Item>
             <Form.Item
                 name="identityCardNumber"
@@ -189,7 +189,7 @@ export default ({defaultValue, onCancel}) => {
                     },
                 ]}
             >
-                <Input placeholder="123456789" disabled={posting || !edit.isEditing}></Input>
+                <Input placeholder="123456789" readOnly={posting || !edit.isEditing}></Input>
             </Form.Item>
             <Form.Item
                 name="placeOfIdentity"
@@ -198,7 +198,7 @@ export default ({defaultValue, onCancel}) => {
             >
                 <Input
                     placeholder="Hòa Bình, Bạc Liêu"
-                    disabled={posting || !edit.isEditing}
+                    readOnly={posting || !edit.isEditing}
                 ></Input>
             </Form.Item>
             <Form.Item
@@ -206,7 +206,7 @@ export default ({defaultValue, onCancel}) => {
                 label="Ngày cấp CMND"
                 rules={[{ required: true, message: 'Vui lòng nhập ngày cấp cmnd' }]}
             >
-                <DatePicker disabled={posting || !edit.isEditing} locale={locale}></DatePicker>
+                <DatePicker allowClear={false} readOnly={posting || !edit.isEditing} locale={locale}></DatePicker>
             </Form.Item>
             <Form.Item
                 name="address"
@@ -215,7 +215,7 @@ export default ({defaultValue, onCancel}) => {
             >
                 <Input
                     placeholder="Hòa Bình, Bạc Liêu"
-                    disabled={posting || !edit.isEditing}
+                    readOnly={posting || !edit.isEditing}
                 ></Input>
             </Form.Item>
             <Form.Item {...buttonCol}>
@@ -234,7 +234,7 @@ export default ({defaultValue, onCancel}) => {
                         style={{ float: 'right' }}
                         type="default"
                         htmlType="button"
-                        disabled={edit.isEditing}
+                        readOnly={edit.isEditing}
                         onClick={() => setEdit({ ...edit, isEditing: true })}
                     >
                         <EditOutlined />
@@ -275,3 +275,4 @@ export default ({defaultValue, onCancel}) => {
         </Form>
     );
 };
+

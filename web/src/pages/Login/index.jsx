@@ -34,6 +34,7 @@ const Login = (props) => {
                             remember: true,
                         }}
                         style={{border: true}}
+                        labelCol={{span: 6}}
                         >
                         <Form.Item
                             label="Số CMND"
@@ -60,12 +61,7 @@ const Login = (props) => {
                         >
                             <Input.Password />
                         </Form.Item>
-
-                        <Form.Item  name="remember" valuePropName="checked">
-                            <Checkbox>Remember me</Checkbox>
-                        </Form.Item>
-
-                        <Form.Item >
+                        <Form.Item wrapperCol={{offset: 6}}>
                             <Button type="primary" style={{height:'35', width: '15  0px', right: 0}} htmlType='submit'>
                                 Đăng nhập
                             </Button>

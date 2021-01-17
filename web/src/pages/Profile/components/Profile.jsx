@@ -28,6 +28,7 @@ export default ({ user }) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
+        console.log(user);
         if (!user) return;
         user.dateOfIdentity = moment(user.dateOfIdentity, 'DD-MM-YYYY');
         user.dateOfBirth = moment(user.dateOfBirth, 'DD-MM-YYYY');

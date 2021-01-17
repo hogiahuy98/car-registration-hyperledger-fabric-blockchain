@@ -132,7 +132,7 @@ export default ({request, reload}) => {
                 <Alert
                     type="success"
                     message="Đã chấp nhận sang tên"
-                    description="Vui lòng đến trụ sở CSGT quận Ninh Kiều tỉnh Cần Thơ để hoàn tất thủ tục và nhận giấy đăng ký xe"
+                    description="Vui lòng đến trụ sở CSGT tại nơi đăng ký để hoàn tất thủ tục và nhận giấy đăng ký xe"
                 ></Alert>
             )}
             <Modal
@@ -146,7 +146,7 @@ export default ({request, reload}) => {
                 <Result
                     status="success"
                     title={'Thành công'}
-                    subTitle={`Đến trụ sở CSGT Quận Ninh Kiều để xác nhận thông tin và nhận giấy tờ xe mới`}
+                    subTitle={`Đến trụ sở CSGT tại nơi đăng ký để xác nhận thông tin và nhận giấy tờ xe mới`}
                 ></Result>
             </Modal>
         </Card>

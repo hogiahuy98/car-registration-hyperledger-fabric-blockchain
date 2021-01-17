@@ -21,21 +21,18 @@ const AuthLayout = (props) => {
                     headers: {
                         Authorization: 'Bearer ' + user.token
                     }
-                })
+                });
                 login(user.token, result.data);
                 if (history.location.pathname === '/') history.push(REDIRECT_PATH[user.role]);
             } catch (error) {
                 logout();
+                console.log(history.location.pathname)
+                if ( history.location.pathname === '/index2' ) return;
                 if (history.location.pathname !== '/index') history.push('/index');
             }
         }
         f();
-    })
-
-
-    
-    
-
+    }, [history.location.pathname])
     return <>{props.children}</>;
 }
 

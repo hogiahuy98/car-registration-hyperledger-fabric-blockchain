@@ -7,8 +7,15 @@ export { User } from './UserInterface';
 export async function getUserByPhoneNumber(phoneNumber: any): Promise<any> {
     try {
         const contract = await getUserContract('admin');
-        const rs = await contract.evaluateTransaction('queryUserByPhoneNumber', phoneNumber);
+        const queryString: any = {};
+        queryString.selector = {
+            phoneNumber: phoneNumber,
+            docType: 'user',
+            role: 'citizen'
+        }
+        const rs = await contract.evaluateTransaction('getQueryResultForQueryString', JSON.stringify(queryString));
         const users = JSON.parse(rs.toString());
+        console.log(users);
         if(users.length === 0) return undefined;
         return users[0];
     } catch (error) {
@@ -16,6 +23,26 @@ export async function getUserByPhoneNumber(phoneNumber: any): Promise<any> {
     }
 }
 
+export async function getPoliceByPhoneNumber(phoneNumber: any): Promise<any> {
+    try {
+        const contract = await getUserContract('admin');
+        const queryString: any = {};
+        queryString.selector = {
+            phoneNumber: phoneNumber,
+            docType: 'user',
+            $or: [
+                {role: 'police'},
+                {role: 'admin'}
+            ]
+        }
+        const rs = await contract.evaluateTransaction('getQueryResultForQueryString', JSON.stringify(queryString));
+        const users = JSON.parse(rs.toString());
+        if(users.length === 0) return undefined;
+        return users[0];
+    } catch (error) {
+        throw error;
+    }
+}
 
 export async function getId(phoneNumber: any): Promise<any> {
     try {

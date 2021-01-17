@@ -25,6 +25,7 @@ export default ({visible, deal, disable}) => {
             const result = await axios.post(url, {}, config);
             if (result.data.success) {
                 setSuccess(true);
+                disable();
             }
         } catch (error) {
             
@@ -57,7 +58,7 @@ export default ({visible, deal, disable}) => {
                 disable();
             }}
             footer={[
-                <Button type="default" loading={loading}>
+                <Button type="default" loading={loading} onClick={() => disable()}>
                     Trở về
                 </Button>,
                 <Popconfirm okText='Đồng ý' cancelText='Trở về' title='Huỷ yêu cầu này?' onConfirm={handleReject}>

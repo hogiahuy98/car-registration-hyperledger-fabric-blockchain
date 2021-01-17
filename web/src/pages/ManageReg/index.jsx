@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Card, Table, Input, Row, Col, Typography, Divider, Badge, Button, Select, DatePicker, Space } from 'antd';
 import { useHistory } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { AuditOutlined, SwapOutlined, SelectOutlined } from '@ant-design/icons';
+import { AuditOutlined, SwapOutlined, SelectOutlined, BarChartOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
 moment.locale('en');
@@ -11,7 +11,8 @@ const {RangePicker} = DatePicker;
 
 import Complete from './components/CompleteRegistration';
 import Information from './components/CitizenInfomation';
-import TransferComfirm from './components/TransferConfirm'
+import TransferComfirm from './components/TransferConfirm';
+import ThongKe from './components/thongke';
 
 import { fetchCurrentUser } from '@/helpers/Auth';
 import { DEFAULT_HOST } from '@/host';
@@ -28,7 +29,8 @@ export default () => {
         registration: {},
         visible: false,
     });
-    const [search, setSeach] = useState({field: 'id'})
+    const [search, setSeach] = useState({field: 'id'});
+    const [thongke, setThongke] = useState(false);
     const [transfer, setTransfer] = useState({
         deal: {
             currentOwner: {},
@@ -74,11 +76,8 @@ export default () => {
     const handleSearch = async (value) => {
         if(value =="") return fetchData();
         setTloading(true)
-        const temp = await getData()
-        const newData = temp.filter((element) => {
-            return element[search.field].includes(value);
-        })
-        setData(newData);
+        const temp = await getData(value);
+        setData(temp);
         setTloading(false);
     } 
 
@@ -196,7 +195,10 @@ export default () => {
         setTloading(true);
         try {
             const cars = await getData();
-            if (cars.length === 0) return;
+            if (cars.length === 0) {
+                setTloading(false);    
+                return
+            };
             setData(() => {
                 return cars.map((car) => {
                     return car;
@@ -209,8 +211,11 @@ export default () => {
         }
     };
 
-    const getData = async () => {
-        const url = DEFAULT_HOST + '/cars';
+    const getData = async (searchValue) => {
+        let url = DEFAULT_HOST + '/cars';
+        if (searchValue) {
+            url = `${url}?${search.field}=${searchValue}`
+        }
         try {
             const result = await axios.get(url, config);
             return result.data;
@@ -255,6 +260,7 @@ export default () => {
                         <Select defaultValue='id' placeholder="Tìm kiếm bằng" style={{ width: '100%' }} onSelect={onSelectField}>
                             <Option value="id">Mã đăng ký</Option>
                             <Option value="registrationNumber">Biển số xe</Option>
+                            <Option value="ownerName">Tên người đăng ký</Option>
                         </Select>
                     </Col>
                     <Col span={8}>
@@ -266,6 +272,9 @@ export default () => {
                             onSearch={handleSearch}
                         />
                     </Col>
+                    {/* <Col span={3} >
+                        <Button type='default' onClick={() => setThongke(true)}><BarChartOutlined /> Thống kê</Button>
+                    </Col> */}
                     <Col offset={5} span={8}>
                         <Space style={{float: 'right'}} >
                             <RangePicker onCalendarChange={handleRangeDate}></RangePicker>
@@ -293,6 +302,7 @@ export default () => {
                 disable={() => setTransfer({ ...transfer, visible: false })}
                 deal={transfer.deal}
             ></TransferComfirm>
+            <ThongKe visible={thongke} disable={() => setThongke(false)}></ThongKe>
         </PageContainer>
     );
 };

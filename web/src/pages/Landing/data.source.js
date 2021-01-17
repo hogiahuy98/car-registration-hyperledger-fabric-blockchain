@@ -12,6 +12,7 @@ export const Nav00DataSource = {
       {
         name: 'item~kibezqe2mh',
         className: 'header0-item',
+        action: 'search',
         children: {
           href: '#',
           children: [
@@ -219,7 +220,7 @@ export const Content90DataSource = {
                     <span>
                       <span>
                         <span>
-                          <p>ĐĂNG KÝ XE LÊN HỆ THỐNG</p>
+                          <p>KÊ KHAI THÔNG TIN XE</p>
                         </span>
                       </span>
                     </span>
@@ -454,5 +455,18 @@ export const Content90DataSource = {
         },
       },
     ],
+  },
+};
+
+export const Footer00DataSource = {
+  wrapper: { className: 'home-page-wrapper footer0-wrapper' },
+  OverPack: { className: 'home-page footer0', playScale: 0.05 },
+  copyright: {
+    className: 'copyright',
+    children: (
+      <span>
+        ©2020 Hồ Gia Huy
+      </span>
+    ),
   },
 };

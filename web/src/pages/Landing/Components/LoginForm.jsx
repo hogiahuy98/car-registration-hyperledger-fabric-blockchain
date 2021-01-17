@@ -40,6 +40,7 @@ const LoginForm = () => {
                 if (user.role === 'admin') history.push('/admin');
             }
             else setFailed(true);
+            setButtonLoading(false);
         } catch (error) {
             console.log(error);
             setButtonLoading(false);
@@ -80,10 +81,6 @@ const LoginForm = () => {
                 ]}
             >
                 <Input.Password value={password} onChange={handlePasswordInput} />
-            </Form.Item>
-
-            <Form.Item  name="remember" valuePropName="checked" wrapperCol={{offset: 6, span: 16}}>
-                <Checkbox>Remember me</Checkbox>
             </Form.Item>
 
             <Form.Item wrapperCol={{offset: 6, span: 16}}>

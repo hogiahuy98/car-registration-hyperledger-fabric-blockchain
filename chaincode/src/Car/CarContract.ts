@@ -1,5 +1,5 @@
 import { Contract ,Context } from 'fabric-contract-api';
-import { Car, TransferDeal } from './Car';
+import { Car, TransferOffer } from './Car';
 import { User } from '../User/User';
 import cars from './cars';
 import { City, District } from './city';
@@ -55,7 +55,9 @@ export class CarContract extends Contract {
                 color: params[5],
                 year: params[6],
                 capality: params[7],
-                owner: params[8], //userID
+                owner: params[8],
+                registrationCity: params[9],
+                registrationDistrict: params[10],
                 registrationState: REGISTRATION_STATE.PENDING,
                 createTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
                 modifyTime: new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString(),
@@ -209,7 +211,6 @@ export class CarContract extends Contract {
 		while (!res.done) {
 			if (res.value && res.value.value.toString()) {
 				let jsonRes: any = {};
-				console.log(res);
 				if (isHistory && isHistory === true) {
 					jsonRes.TxId = res.value.tx_id;
 					jsonRes.Timestamp = res.value.timestamp;
@@ -244,7 +245,7 @@ export class CarContract extends Contract {
         return find![0];
     }
 
-    public async createTransferDeal(ctx: Context,requestId: string, carId: string, currentOwner: string, newOwner: string): Promise<string> {
+    public async createTransferOffer(ctx: Context,requestId: string, carId: string, currentOwner: string, newOwner: string): Promise<string> {
         const carAsBytes = await ctx.stub.getState(carId);
         const car: Car = JSON.parse(carAsBytes.toString())
         car.modifyType = MODIFY_TYPE.CHANGE_OWNER;
@@ -252,7 +253,7 @@ export class CarContract extends Contract {
         car.modifyUser = currentOwner;
         car.registrationState = REGISTRATION_STATE.TRANSFERRING_OWNERSHIP;
         await ctx.stub.putState(car.id, Buffer.from(JSON.stringify(car)));
-        const request: TransferDeal = {
+        const request: TransferOffer = {
             id: requestId,
             currentOwner: currentOwner,
             newOwner: newOwner,
@@ -279,9 +280,9 @@ export class CarContract extends Contract {
     }
 
 
-    public async approveTransfer(ctx: Context, transferDealId: string): Promise<string> {
-        const dealAsByte = await ctx.stub.getState(transferDealId);
-        const deal: TransferDeal = JSON.parse(dealAsByte.toString());
+    public async approveTransfer(ctx: Context, TransferOfferId: string): Promise<string> {
+        const dealAsByte = await ctx.stub.getState(TransferOfferId);
+        const deal: TransferOffer = JSON.parse(dealAsByte.toString());
         if(deal.newOwner !== this.getUserId(ctx)) return "PERMISSION DENIED";
 
         deal.state = CHANGE_OWNER_STATE.APPROVED;
@@ -308,7 +309,7 @@ export class CarContract extends Contract {
         if(user.role !== 'police') return "PERMISSION DENIED";
 
         const dealAsByte = await ctx.stub.getState(transferRequestId);
-        const deal: TransferDeal = JSON.parse(dealAsByte.toString());
+        const deal: TransferOffer = JSON.parse(dealAsByte.toString());
 
         deal.state = CHANGE_OWNER_STATE.CONFIRMED;
         deal.modifyTime = new Date(ctx.stub.getTxTimestamp().seconds * 1000).toString();
@@ -334,7 +335,7 @@ export class CarContract extends Contract {
         const userAsByte = await ctx.stub.getState(this.getUserId(ctx));
         const user: User = JSON.parse(userAsByte.toString());
         const dealAsByte = await ctx.stub.getState(transferId);
-        const deal: TransferDeal = JSON.parse(dealAsByte.toString());
+        const deal: TransferOffer = JSON.parse(dealAsByte.toString());
         const carAsBytes = await ctx.stub.getState(deal.carId);
         const car: Car = JSON.parse(carAsBytes.toString());
         if ([deal.newOwner, deal.currentOwner].includes(user.id) || user.role ==='police'){
@@ -437,7 +438,6 @@ export class CarContract extends Contract {
     public async addCity(ctx: Context, payload: string) {
         try {
             const city: City = JSON.parse(payload);
-            city.currentSeries = 0;
             city.docType = "city";
             await ctx.stub.putState(city.id, Buffer.from(JSON.stringify(city)));
             return true;
@@ -459,13 +459,46 @@ export class CarContract extends Contract {
         }
     }
 
-    public async switchSeri(ctx: Context, cityId: string) {
+    public async addDistrict(ctx: Context, payload: string) {
         try {
-            const city: City = JSON.parse((await ctx.stub.getState(cityId)).toString());
-            city.currentSeries++;
-            await ctx.stub.putState(city.id, Buffer.from(JSON.stringify(city)));
+            const district: District = JSON.parse(payload);
+            district.docType = 'district';
+            await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
+            return true;
         } catch (error) {
-            console.log(error)
+            console.log(error);
+            return false;
         }
     }
+
+    public async updateDistrict(ctx: Context, payload: string) {
+        try {
+            const district: District = JSON.parse(payload);
+            await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    // public async switchSeri(ctx: Context, districtId: string) {
+    //     try {
+    //         const district: District = JSON.parse((await ctx.stub.getState(districtId)).toString());
+    //         district.seriesIndex++;
+    //         await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
+    // public async switchNumber(ctx: Context, districtId: string) {
+    //     try {
+    //         const district: District = JSON.parse((await ctx.stub.getState(districtId)).toString());
+    //         district.numberIndex++;
+    //         await ctx.stub.putState(district.id, Buffer.from(JSON.stringify(district)));
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
 }

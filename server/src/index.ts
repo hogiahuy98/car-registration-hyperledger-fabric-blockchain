@@ -3,6 +3,7 @@ import * as bodyParser from "body-parser";
 import userRouter from './api/user.api';
 import carRouter from './api/car.api';
 import authRouter from './api/auth.api';
+import cityRouter from './api/city.api';
 import * as dotenv from 'dotenv';
 import cors from 'cors';
 // import { authentication } from './middleware/auth.middleware'
@@ -26,7 +27,8 @@ app.use(cors());
 
 app.use('/users', userRouter);
 app.use('/cars', carRouter);
-app.use('/auth', authRouter)
+app.use('/auth', authRouter);
+app.use('/city', cityRouter)
 
 app.get("/test", (req: Request, res: Response) => {
     res.status(200).send("Hello World!");

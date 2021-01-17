@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { User, registerUser, getUserByPhoneNumber, getId } from '../fabric/user/User.fabric';
+import { User, registerUser, getUserByPhoneNumber, getPoliceByPhoneNumber, getId } from '../fabric/user/User.fabric';
 import * as bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
 import * as jwt from 'jsonwebtoken';
@@ -47,7 +47,7 @@ router.post('/registry/police', authentication, async (req: Request, res: Respon
         const citizen: User = {
             id: 'U' + nanoid().toUpperCase(),
             fullName: req.body.fullName,
-            phoneNumber:'CS' + req.body.phoneNumber,
+            phoneNumber:req.body.phoneNumber,
             dateOfBirth: req.body.dateOfBirth,
             password: bcrypt.hashSync(req.body.password, 5),
             identityCardNumber: req.body.identityCardNumber,
@@ -73,6 +73,38 @@ router.post('/registry/police', authentication, async (req: Request, res: Respon
 
 });
 
+router.post('/login-police', async (req: Request, res: Response) => {
+    console.log("cc");
+    try {
+        const user = await getPoliceByPhoneNumber(req.body.phoneNumber);
+        if(typeof user === 'undefined') return res.send({ success: false, message: "Số điện thoại hoặc mật khẩu không đúng" });
+        const isCorrectPassword = await bcrypt.compare(req.body.password, user.Record.password);
+        if(!isCorrectPassword) {
+            const rs = {
+                success: false,
+                message: "Incorrect identity card or password"
+            };
+            return res.status(401).send(rs);
+        }
+        delete user.Record.password;
+        const token = jwt.sign(user.Record, jwt_secret)
+        const rs = {
+            success: true,
+            data: {
+                user: user.Record,
+                token: token
+            }
+        }
+        res.status(200).json(rs);
+    } catch (error) {
+        console.log(error);
+        if (error === FABRIC_ERROR_CODE.IDENTITY_NOT_FOUND_IN_WALLET)
+            return res.status(403).send({
+                success: false,
+                message: "Incorrect identity card or password"
+            })
+    }
+});
 
 router.post('/login', async (req: Request, res: Response) => {
     try {
@@ -105,6 +137,7 @@ router.post('/login', async (req: Request, res: Response) => {
             })
     }
 });
+
 
 
 export default router;

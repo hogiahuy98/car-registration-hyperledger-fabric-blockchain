@@ -12,19 +12,24 @@ export interface Car {
     createTime?: string;
     modifyTime?: string;
     registrationState?: string;
+    registrationCity?: string;
+    registrationDistrict?: string;
     processedPolice?: string;
 }
-
 export class City {
     public id?: string;
     public name?: string;
-    public headquartersAddress?: string;
     public number?: string|string[];
-    public series?: Array<string>;
-    public currentSeries?: number;
+    public series?: string[];
     public docType?: string;
 }
 
-export class District extends City {
-    public under?: string;
+export class District{
+    public id?: string;
+    public districtName?: string;
+    public city?: string;
+    public numberIndex?: number;
+    public seriesIndex?: number;
+    public docType?: string;
+    public headquartersAddress?: string;
 }
