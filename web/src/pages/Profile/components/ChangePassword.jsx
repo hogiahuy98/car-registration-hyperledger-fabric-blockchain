@@ -41,7 +41,7 @@ export default () => {
             >
                 <Input type="password"></Input>
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 6 }}>
+            <Form.Item wrapperCol={{ offset: 8 }}>
                 <Button htmlType="submit" type="primary">
                     Đổi mật khẩu
                 </Button>

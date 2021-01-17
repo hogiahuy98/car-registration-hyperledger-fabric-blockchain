@@ -4,9 +4,12 @@ import {DESCRIPTION_LABEL} from './Constants';
 import moment from 'moment';
 
 export default ({car}) => {
-    console.log(car)
+    console.log(car.registrationCity);
     return (
             <Descriptions column={2} bordered>
+                <Descriptions.Item label="Mã đăng ký">
+                    {car.id}
+                </Descriptions.Item>
                 <Descriptions.Item label={DESCRIPTION_LABEL.REGISTRATION_DATE}>
                     Ngày {moment(car.registrationTime).format("D/MM/YYYY, hh:mm:ss")}
                 </Descriptions.Item>
@@ -33,6 +36,12 @@ export default ({car}) => {
                 </Descriptions.Item>
                 <Descriptions.Item label="Biển số xe" span={1} >
                     <Typography.Text aria-label='center'> {car.registrationNumber}</Typography.Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Tỉnh, thành đăng ký">
+                    {car.registrationCity.name}
+                </Descriptions.Item>
+                <Descriptions.Item label="Quận, huyện">
+                    {car.registrationDistrict.districtName}
                 </Descriptions.Item>
             </Descriptions>
     )

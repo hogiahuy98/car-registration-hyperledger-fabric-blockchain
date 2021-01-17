@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Card, Table, Input, Row, Col, Typography, Divider, Badge, Button, Select, Space, Modal, Tag } from 'antd';
+import { Card, Table, Input, Row, Col, Typography, Divider, Badge, Button, Select, Space, Modal, Tag, Popover, Descriptions } from 'antd';
 import { useHistory } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { PlusOutlined} from '@ant-design/icons';
@@ -43,7 +43,6 @@ export default () => {
     }
 
     const handleChangeSearchType = (value) => {
-        console.log(value);
         setSearchField(value);
     }
 
@@ -90,19 +89,27 @@ export default () => {
         },{
           title: "Xác thực",
           render: (text, record) => {
-                if (!record.verified)
-                    return <Tag color='warning'>Chưa xác thực</Tag>
-                else
-                    return <Tag color='success'>Đã xác thực</Tag>
-          }  
+              if (!record.verified) return <Tag color="warning">Chưa xác thực</Tag>;
+              else
+                  return (
+                      <Popover title="Người xác thực" content={
+                          (<Descriptions size='small' style={{width: "400px"}} column={1} bordered> 
+                              <Descriptions.Item label="Họ và tên">{record.verifyPolice.fullName}</Descriptions.Item>
+                              <Descriptions.Item label="ID">{record.verifyPolice.id}</Descriptions.Item>
+                          </Descriptions>)
+                      }>
+                          <Tag color="success">Đã xác thực</Tag>
+                      </Popover>
+                  )
+          }
         },
         {
             title: "Thao tác",
             render: (text, record) => {
                 if (!record.verified)
-                    return <Button type='link' onClick={() => handleEditClick(record)}>Xác thực ngay</Button>
+                    return <Button type='default' onClick={() => handleEditClick(record)}>Xác thực ngay</Button>
                 else
-                    return <Button type='link' onClick={() => handleEditClick(record)}>Chỉnh sửa</Button>
+                    return <Button type='default' onClick={() => handleEditClick(record)}>Chi tiết</Button>
             }
         }
     ]
@@ -115,6 +122,8 @@ export default () => {
                         <Select onChange={handleChangeSearchType} placeholder="Tìm kiếm bằng" style={{ width: '100%' }}>
                             <Select.Option value="phoneNumber">Số điện thoại</Select.Option>
                             <Select.Option value="identityCardNumber">Số CMND</Select.Option>
+                            <Select.Option value="fullName">Họ và tên</Select.Option>
+                            <Select.Option value="id">ID</Select.Option>
                         </Select>
                     </Col>
                     <Col span={8}>
@@ -136,13 +145,13 @@ export default () => {
                     </Col>
                 </Row>
                 <Divider></Divider>
-                <Table loading={tableLoading} columns={columns} dataSource={users}></Table>
+                <Table tableLayout='fixed' loading={tableLoading} columns={columns} dataSource={users}></Table>
             </Card>
             <Modal
                 visible={editModal}
                 footer={null}
                 onCancel={() => setEditModal(false)}
-                title={editRow.verified ? "Chỉnh sửa người dùng" : "Xác thực người dùng"}
+                title={editRow.verified ? "Chi tiết người dùng" : "Xác thực người dùng"}
                 destroyOnClose
                 centered
             >

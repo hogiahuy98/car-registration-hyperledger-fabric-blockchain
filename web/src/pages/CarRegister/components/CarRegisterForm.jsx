@@ -1,8 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, Form, Input, DatePicker, InputNumber, Button, Result, Modal, Space, Select } from 'antd';
+import { Card, Form, Input, DatePicker, InputNumber, Button, Result, Modal, Space, Select, Steps, Divider } from 'antd';
+import { LoadingOutlined, FormOutlined, UserOutlined, FileTextOutlined, CarFilled, CheckCircleFilled } from '@ant-design/icons';
 import { DEFAULT_HOST } from '@/host';
 import axios from 'axios';
 import { REGISTRATION_FIELD } from './Constants'
+
+const {Step} = Steps
 
 import { fetchCurrentUser, logout } from '@/helpers/Auth';
 
@@ -90,6 +93,13 @@ export default (props) => {
 
     return (
         <Card title={props.title}>
+            <Steps current={1} style={{paddingBottom: "30px",}}>
+                <Step icon={<CheckCircleFilled />} title="Bước 1" description="Đăng ký tài khoản"/>
+                <Step icon={<CarFilled />} title="Bước 2" description="Kê khai thông tin"/>
+                <Step icon={<FileTextOutlined />} title="Bước 3" description="Chuẩn bị giấy tờ"/>
+                <Step icon title="Bước 4" description="Đến trụ sở đăng ký"/>
+                <Step icon title="Bước 5" description="Hoàn thành"/>
+            </Steps>
             <Form
                 autoComplete="off"
                 labelAlign="left"
@@ -140,7 +150,7 @@ export default (props) => {
                     name="registrationCity"
                     label="Tỉnh, thành đăng ký"
                     rules={[{ required: true, message: 'Vui lòng chọn tỉnh, thành đăng ký' }]}
-                    wrapperCol={{span:8}}
+                    wrapperCol={{ span: 8 }}
                 >
                     <Select
                         options={cities.map((city) => {
@@ -159,7 +169,7 @@ export default (props) => {
                     name="registrationDistrict"
                     label="Quận, huyện"
                     rules={[{ required: true, message: 'Vui lòng chọn quận, huyện đăng ký' }]}
-                    wrapperCol={{span:8}}
+                    wrapperCol={{ span: 8 }}
                 >
                     <Select
                         disabled={!cityPicked}

@@ -60,5 +60,5 @@ export default {
   'menu.help': 'Trợ giúp',
   'menu.manage-user': "Quản lí người dùng",
   "menu.analysis":"Thống kê",
-  "menu.manage-city":"Quản lí tỉnh, thành"
+  "menu.manage-city":"Quản lí khu vực đăng ký"
 };

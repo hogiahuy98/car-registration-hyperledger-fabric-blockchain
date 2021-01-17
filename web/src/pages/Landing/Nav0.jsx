@@ -4,6 +4,7 @@ import { Menu, Modal } from 'antd';
 import { getChildrenToRender } from './utils';
 import LoginForm from './Components/LoginForm';
 import RegisterForm from './Components/RegisterFrom';
+import Search from './Components/Search'
 
 const { Item, SubMenu } = Menu;
 
@@ -28,6 +29,11 @@ class Header extends React.Component {
   searchClick = () => {
     this.setState({
       searchModal: true,
+    })
+  }
+  searchOut = () => {
+    this.setState({
+      searchModal: false,
     })
   }
 
@@ -100,6 +106,7 @@ class Header extends React.Component {
       let click;
       if(item.action === 'signin') click = this.signinClick;
       if(item.action === 'signup') click = this.signupClick;
+      if(item.action === 'search') click = this.searchClick;
       return (
         <Item key={item.name} {...itemProps}>
           <a {...a} className={`header0-item-block ${a.className}`.trim()} onClick={click}>
@@ -183,6 +190,16 @@ class Header extends React.Component {
           footer={null}
         >
             <RegisterForm></RegisterForm>
+        </Modal>
+        <Modal
+          centered
+          style={{top:0}}
+          onCancel={this.searchOut}
+          destroyOnClose visible={this.state.searchModal}
+          title='Tra cứu xe bằng biển số'
+          footer={null}
+        >
+            <Search/>
         </Modal>
       </TweenOne>
     );

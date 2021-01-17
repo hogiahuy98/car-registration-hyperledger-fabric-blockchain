@@ -26,6 +26,9 @@ import randomstring from 'randomstring';
 const router = Router();
 
 // /car/ POST
+
+
+
 router.post('/', authentication, async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
@@ -51,18 +54,60 @@ router.post('/', authentication, async (req: Request, res: Response) => {
 
 router.get('/', authentication, async (req: Request, res: Response) => {
     const id = req.user.id;
-    const cars = await getAllCars(id);
-    if(!cars.result.cars || cars.result.cars.length === 0) return res.sendStatus(404)
-    const result = await Promise.all(cars.result.cars.map(async (state: { Record: any; }) => {
+    const queryString: any = {};
+    queryString.selector = {docType: "car"};
+    if(req.query.id) {
+        queryString.selector.id = {
+            $regex: req.query.id
+        }
+    }
+    if(req.query.registrationNumber) {
+        queryString.selector.registrationNumber = {
+            $regex: req.query.registrationNumber
+        }
+    }
+    const cars = await queryCars(id, JSON.stringify(queryString));
+    if(!cars|| cars.ength === 0) return res.sendStatus(404)
+    let result: any = await Promise.all(cars.map(async (state: { Record: any; }) => {
         const car = state.Record;
         const user = await getUserById(car.owner);
         delete user.password
         car.owner = user;
         return car;
-    }))
+    }));
+    if (req.query.ownerName){
+        result = result.filter((ele: any) => {
+            return ele.owner.fullName.includes(req.query.ownerName);
+        })
+    }
     res.json(result);
 });
 
+
+router.get('/search', async (req: Request, res: Response) => {
+    const registrationNumber = req.query.registrationNumber;
+    const queryString = {
+        selector: {
+            registrationNumber,
+            docType: 'car'
+        }
+    }
+    try {
+        const results = await queryCars("admin", JSON.stringify(queryString));
+        console.log(results)
+        if (results.length === 0) {
+            return res.sendStatus(404);
+        }
+        else {
+            const result = results[0].Record;
+            result.registrationCity = await getCity(result.registrationCity);
+            return res.send(result);
+        }
+    } catch (error) {
+        console.log(error);
+        return res.send( { valid: false });
+    }
+})
 
 router.get('/checkEngineNumber', authentication, async (req: Request, res: Response) => {
     const engineNumber = req.query.en;
@@ -174,6 +219,18 @@ router.get('/:id', authentication, async (req: Request, res: Response) => {
         id: req.params.id
     }
     const result = await queryCars(req.user.id, JSON.stringify(queryString));
+    queryString.selector = {
+        docType: 'district',
+        id: result[0].registrationDistrict
+    }
+    const district = await queryCars(req.user.id, JSON.stringify(queryString));
+    queryString.selector = {
+        docType: 'city',
+        id: result[0].registrationCity,
+    }
+    const city = await queryCars(req.user.id, JSON.stringify(queryString));
+    result[0].Record.registrationCity = city[0].Record;
+    result[0].Record.registrationDistrict = district[0].Record;
     res.json(result[0]);
 });
 
@@ -226,27 +283,61 @@ router.put('/:id', authentication, async (req: Request, res: Response) => {
 })
 
 
-router.get('/:id/history', authentication, async (req: Request, res: Response) => {
-    const id = req.user.id;
-    const carHistory = await getHistoryOfCar(id, req.params.id);
-    const result = await Promise.all(carHistory.map( async (state: any) => {
-        const queryString: any = {};
-        queryString.selector = {
-            docType: 'user',
-            id: state.Value.modifyUser,
+router.get(
+    "/:id/history",
+    authentication,
+    async (req: Request, res: Response) => {
+        try {
+            const id = req.user.id;
+            const carHistory = await getHistoryOfCar(id, req.params.id);
+            const result = await Promise.all(
+                carHistory.map(async (state: any) => {
+                    const queryString: any = {};
+                    queryString.selector = {
+                        docType: "user",
+                        id: state.Value.modifyUser,
+                    };
+                    const modifyUser = await queryCars(
+                        id,
+                        JSON.stringify(queryString)
+                    );
+                    queryString.selector = {
+                        docType: "user",
+                        id: state.Value.owner,
+                    };
+                    const owner = await queryCars(
+                        id,
+                        JSON.stringify(queryString)
+                    );
+                    queryString.selector = {
+                        docType: "district",
+                        id: state.Value.registrationDistrict,
+                    };
+                    const district = await queryCars(
+                        id,
+                        JSON.stringify(queryString)
+                    );
+                    queryString.selector = {
+                        docType: "city",
+                        id: state.Value.registrationCity,
+                    };
+                    const city = await queryCars(
+                        id,
+                        JSON.stringify(queryString)
+                    );
+                    state.Value.modifyUser = modifyUser[0].Record;
+                    state.Value.owner = owner[0].Record;
+                    state.Value.registrationCity = city[0].Record;
+                    state.Value.registrationDistrict = district[0].Record;
+                    return state;
+                })
+            );
+            res.send(result);
+        } catch {
+            res.sendStatus(404);
         }
-        const result = await queryCars(id, JSON.stringify(queryString));
-        queryString.selector = {
-            docType: 'user',
-            id: state.Value.owner,
-        }
-        const result2 = await queryCars(id, JSON.stringify(queryString));
-        state.Value.modifyUser = result[0].Record;
-        state.Value.owner = result2[0].Record;
-        return state
-    }))
-    res.send(result);
-})
+    }
+);
 
 
 router.put('/:id/acceptRegistration/', authentication, async (req: Request, res: Response) => {
@@ -261,7 +352,7 @@ router.put('/:id/acceptRegistration/', authentication, async (req: Request, res:
         console.log(car);
         const city = await getCity(car.registrationCity);
         const district = await getDistrict(car.registrationDistrict);
-        const prefix = city.number[district.numberIndex] + city.series[district.seriesIndex] + '-';
+        const prefix = district.currentNumber + district.currentSeri + '-';
         console.log(prefix)
         while (!validNumber){
             registrationNumber = randomstring.generate({

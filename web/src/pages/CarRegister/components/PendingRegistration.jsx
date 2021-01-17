@@ -1,11 +1,14 @@
 import React, {useState} from 'react';
-import { Card, Descriptions, Typography, Button, Divider, Modal, Result, Popconfirm} from 'antd';
+import { Card, Descriptions, Typography, Button, Divider, Modal, Result, Popconfirm, Steps} from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
+import { LoadingOutlined, FormOutlined, UserOutlined, FileTextOutlined, CarFilled, CheckCircleFilled } from '@ant-design/icons';
 import moment from 'moment';
 import { REGISTRATION_FIELD } from './Constants';
 import axios from 'axios';
 import { DEFAULT_HOST } from '@/host';
 import { fetchCurrentUser } from '@/helpers/Auth';
+
+const {Step} = Steps;
 
 const title = (
     <Typography.Text style={{ color: 'blue' }}>
@@ -65,6 +68,13 @@ export default ({ registration, reload }) => {
 
     return (
         <Card title={title}>
+            <Steps current={2} style={{paddingBottom: "30px",}}>
+                <Step icon={<CheckCircleFilled />} title="Bước 1" description="Đăng ký tài khoản"/>
+                <Step icon={<CheckCircleFilled />} title="Bước 2" description="Kê khai thông tin"/>
+                <Step icon={<FileTextOutlined />} title="Bước 3" description="Chuẩn bị giấy tờ"/>
+                <Step icon title="Bước 4" description="Đến trụ sở đăng ký"/>
+                <Step icon title="Bước 5" description="Hoàn thành"/>
+            </Steps>
             <Descriptions column={1} bordered>
                 <Descriptions.Item label={label(REGISTRATION_FIELD.REG_ID.LABEL)}>
                     {id}

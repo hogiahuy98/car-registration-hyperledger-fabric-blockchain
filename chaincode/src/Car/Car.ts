@@ -1,4 +1,4 @@
-export class Car {
+export class Car{
     public id: string;
     public registrationNumber?: string;
     public brand: string;
@@ -22,7 +22,7 @@ export class Car {
     public docType: string;
 }
 
-export class TransferDeal {
+export class TransferOffer{
     public id: string;
     public carId: string;
     public currentOwner: string;

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { User, queryUser, modifyUser, verifyUser, changePassword } from '../fabric/user/User.fabric';
+import { User, queryUser, modifyUser, verifyUser, changePassword, getUserById } from '../fabric/user/User.fabric';
 import { authentication } from '../middleware/auth.middleware';
 import { queryCars, getCity, getDistrict } from '../fabric/car/Car.fabric';
 import * as bcrypt from 'bcrypt';
@@ -23,15 +23,15 @@ router.get('/', authentication, async (req: Request, res: Response) => {
     ]
     try {
         const users = await queryUser(req.user.id, JSON.stringify(queryString));
-        const response = users.map((user: { Record: any; }) => {
-            if (user.Record.role === 'police') {
-                user.Record.phoneNumber = user.Record.phoneNumber.substring(2, user.Record.phoneNumber.length)
+        const response = await Promise.all(users.map(async (user: { Record: any; }) => {
+            if (user.Record.role === 'citizen' && user.Record.verified) {
+                const verifyPolice = await getUserById(user.Record.verifyPolice);
+                user.Record.verifyPolice = verifyPolice;
             }
             return user.Record;
-        });
+        }));
         return res.send(response);
     } catch (error) {
-        console.log(error);
         res.sendStatus(404);
     }
 })
@@ -76,6 +76,7 @@ router.get('/validate/', async (req: Request, res: Response) => {
     const queryString: any = {};
     queryString.selector = {
         docType: 'user',
+        role: 'citizen'
     }
     queryString.selector[field?field.toString():''] = value;
     try{

@@ -10,8 +10,8 @@ export class District{
     public id: string;
     public districtName: string;
     public city: string;
-    public numberIndex?: number;
-    public seriesIndex?: number;
+    public currentNumber?: number;
+    public currentSeri?: number;
     public docType?: string;
     public headquartersAddress?: string;
 }

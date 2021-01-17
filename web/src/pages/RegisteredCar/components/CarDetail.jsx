@@ -7,7 +7,7 @@ import moment from 'moment';
 import { fetchCurrentUser } from '@/helpers/Auth'
 
 const TIMELINE_ACTION_TYPE = [
-    "Đăng ký lên hệ thống",
+    "Kê khai thông tin xe",
     "CSGT đăng kiểm, bấm biển số",
     "Huỷ đăng ký",
     "Yêu cầu chuyển đổi quyền sở hữu",
@@ -19,6 +19,8 @@ const TIMELINE_ACTION_TYPE = [
 
 export default (props) => {
     const [timeline, setTimeline] = useState([]);
+    const [car, setCar] = useState({});
+    const [loading, setLoading] = useState(true);
     const auth = fetchCurrentUser();
 
     const config = {
@@ -26,10 +28,11 @@ export default (props) => {
             Authorization: `Bearer ${auth.token}`,
         }
     }
-    const car = {...props.car};
+    
     const title = <Typography.Text strong>{`${car.brand} ${car.model}`}</Typography.Text>
 
     useEffect(() => {
+        setLoading(true);
         const fetchTimeline = async () => {
             const url = `${DEFAULT_HOST}/cars/${car.id}/history`;
             try {
@@ -41,18 +44,21 @@ export default (props) => {
                         return element.Value;
                     })
                     setTimeline(tl.reverse());
+                    setLoading(false);
                 }
             } catch(error) {
                 console.log(error);
             }
         }
         fetchTimeline();
-    }, [])
+    }, [car])
 
-    useEffect(() => console.log(timeline), [timeline]);
+    useEffect(() => {
+        setCar({...props.car});
+    }, [props]);
 
     return (
-    <Card size='small' title={title} loading={false}>
+    <Card size='small' title={title} loading={loading} >
             <Descriptions column={2} bordered style={{borderColor: 'white'}}>
                 <Descriptions.Item label={DESCRIPTION_LABEL.REGISTRATION_DATE}>
                     Ngày {car.registrationDate}
@@ -77,6 +83,9 @@ export default (props) => {
                 </Descriptions.Item>
                 <Descriptions.Item label={DESCRIPTION_LABEL.ENGINE_NUMBER}>
                     {car.engineNumber}
+                </Descriptions.Item>
+                <Descriptions.Item label={DESCRIPTION_LABEL.REGISTRATION_NUMBER}>
+                    {car.registrationNumber}
                 </Descriptions.Item>
             </Descriptions>
             <Divider/>

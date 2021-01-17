@@ -136,7 +136,7 @@ export async function requestChangeOwner(carId: string,  newOwner: string, curre
     try {
         const contract = await getCarContract(currentOwner);
         const dealId = 'D' + nanoid().toUpperCase();
-        const TxIDByte = await contract.submitTransaction('createTransferDeal', dealId, carId, currentOwner, newOwner);
+        const TxIDByte = await contract.submitTransaction('createTransferOffer', dealId, carId, currentOwner, newOwner);
         const TxID = TxIDByte.toString();
         if( TxID !== "" || TxID.length !== 0) {
             return { success: true, result: { TxID: TxID } }

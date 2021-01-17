@@ -7,7 +7,7 @@ test:
     rounds:
       - label: 200tps
         description: Đăng ký xe benchmark
-        txNumber: 10000
+        txNumber: 3000
         rateControl: 
           type: fixed-rate
           opts:

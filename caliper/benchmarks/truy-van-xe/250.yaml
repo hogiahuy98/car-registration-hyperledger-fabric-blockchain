@@ -3,11 +3,11 @@ test:
     description: test benchmark
     workers:
       type: local
-      number: 5
+      number: 2
     rounds:
       - label: 500tps
         description: Truy vấn xe
-        txDuration: 60
+        txNumber: 3000
         rateControl: 
           type: fixed-rate
           opts:

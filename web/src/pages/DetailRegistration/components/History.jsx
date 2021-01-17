@@ -1,10 +1,10 @@
 import React from 'react';
-import {Button, Table} from 'antd';
+import {Button, Popover, Table} from 'antd';
 import { useEffect } from 'react';
 
 const TIMELINE_ACTION_TYPE = [
     "Đăng ký lên hệ thống",
-    "CSGT đăng kiểm, bấm biển số",
+    "CSGT kiểm duyệt, cấp biển số",
     "Huỷ đăng ký",
     "Yêu cầu chuyển đổi quyền sở hữu",
     "Thay đổi thông tin xe",
@@ -28,8 +28,16 @@ export default ({history, watchState, loading}) => {
             key: 'user',
             render: (text, record) => {
                 if (record.modifyUser.role === 'police')
-                    return 'CSGT. ' + record.modifyUser.fullName;
-                return record.modifyUser.fullName;
+                    return (
+                        <Popover title="ID" content={record.modifyUser.id}>
+                            {'CSGT. ' + record.modifyUser.fullName}
+                        </Popover>
+                    );
+                    return (
+                        <Popover title="ID" content={record.modifyUser.id}>
+                            {record.modifyUser.fullName}
+                        </Popover>
+                    );
             },
         },
         {

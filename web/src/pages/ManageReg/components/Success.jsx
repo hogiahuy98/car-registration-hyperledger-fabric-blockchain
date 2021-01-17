@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import {Result} from 'antd';
+import {Result, Spin} from 'antd';
 import Icon from '@ant-design/icons';
 import { DEFAULT_HOST } from '@/host';
 import axios from 'axios';
-import { fetchCurrentUser } from '@/helpers/Auth'
+import { fetchCurrentUser } from '@/helpers/Auth';
 export default ({regId}) => {
     const [registration, setRegistration] = useState({});
     const user = fetchCurrentUser();
@@ -27,12 +27,14 @@ export default ({regId}) => {
     }, [regId])
 
     return (
-        <Result
+        
+        <Spin spinning={typeof registration.registrationNumber === 'undefined'}>
+            <Result
             status='success'
-            title={'ĐÃ HOÀN THÀNH ĐĂNG KÝ. BIỂN SỐ XE ' + registration.registrationNumber}
+            title={'ĐÃ HOÀN THÀNH ĐĂNG KÝ. BIỂN SỐ XE ' +  registration.registrationNumber}
             subTitle='Vui lòng nhận giấy đăng ký xe và biển số vào 3 ngày nữa tại văn phòng CSGT'
-        >
-
-        </Result>
+            >
+            </Result>
+        </Spin>
     )
 }

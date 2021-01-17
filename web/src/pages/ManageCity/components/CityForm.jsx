@@ -9,7 +9,7 @@ const useForm = Form.useForm;
 
 export default ({edit, disable}) => {
     const [numbers, setNumbers] = useState([]);
-    const [series, setSeries] = useState([]);
+    const [series, setSeries] = useState(["A", "B", "C", "D", "E", "F", "G", "H", "K", "L", "M", "N", "P", "S", "T", "U", "V", "X", "Y", "Z"]);
     const [loading, setLoading] = useState(false);
     const [districts, setDistricts] = useState([])
     const user = fetchCurrentUser();
@@ -47,6 +47,7 @@ export default ({edit, disable}) => {
     }
 
     const formFinish = async (value) => {
+        value.city.series = series;
         setLoading(true);
         const url = DEFAULT_HOST + '/city';
         let mess;
@@ -86,7 +87,7 @@ export default ({edit, disable}) => {
     }
 
     const isAlreadyAxistNumber = async (number) => {
-        const url = DEFAULT_HOST + '/city?number=' + number + (edit ? "&id=" + edit.id : null);
+        const url = DEFAULT_HOST + '/city?number=' + number + (edit ? "&id=" + edit.id : "");
         const result = await axios.get(url, config);
         if (result.data.length > 0) return true;
         return false;
@@ -133,21 +134,12 @@ export default ({edit, disable}) => {
                     onChange={setNumbers}
                 ></Select>
             </Form.Item>
-            <Form.Item name={['city', 'series']} label="Seri biển số">
-                <Select
-                    disabled={loading}
-                    mode="tags"
-                    placeholder="Ví dụ: A, B, F..."
-                    notFoundContent={null}
-                    onChange={setSeries}
-                ></Select>
-            </Form.Item>
             <Form.List name="districts">
                 {(fields, { add, remove }) => (
                     <>
                         {fields.map((field) => (
                             <>
-                                <Card>
+                                <Card style={{paddingBottom: "0px"}}>
                                     <Form.Item
                                         {...field}
                                         name={[field.name, 'districtName']}
@@ -167,31 +159,31 @@ export default ({edit, disable}) => {
                                     </Form.Item>
                                     <Form.Item
                                         label="Số hiệu"
-                                        name={[field.name, 'numberIndex']}
+                                        name={[field.name, 'currentNumber']}
                                         initialValue={
                                             districts.length > 0 && field.key < districts.length
-                                                ? districts[field.key].numberIndex
-                                                : 0
+                                                ? districts[field.key].currentNumber
+                                                : numbers[0]
                                         }
                                     >
                                         <Radio.Group
                                             disabled={loading}
                                             defaultValue={
                                                 districts.length > 0 && field.key < districts.length
-                                                    ? districts[field.key].numberIndex
-                                                    : 0
+                                                    ? districts[field.key].currentNumber
+                                                    : numbers[0]
                                             }
                                             value={
                                                 districts.length > 0&& field.key < districts.length
-                                                    ? districts[field.key].numberIndex
-                                                    : 0
+                                                    ? districts[field.key].currentNumber
+                                                    : numbers[0]
                                             }
                                             optionType="button"
                                             buttonStyle="solid"
                                         >
                                             {numbers.map((number, index) => {
                                                 return (
-                                                    <Radio.Button value={index}>
+                                                    <Radio.Button value={number}>
                                                         {number}
                                                     </Radio.Button>
                                                 );
@@ -200,32 +192,32 @@ export default ({edit, disable}) => {
                                     </Form.Item>
                                     <Form.Item
                                         {...field}
-                                        name={[field.name, 'seriesIndex']}
+                                        name={[field.name, 'currentSeri']}
                                         label="Seri"
                                         initialValue={
                                             districts.length > 0 && field.key < districts.length
-                                                ? districts[field.key].seriesIndex
-                                                : 0
+                                                ? districts[field.key].currentSeri
+                                                : "A"
                                         }
                                     >
                                         <Radio.Group
                                             disabled={loading}
                                             defaultValue={
                                                 districts.length > 0 && field.key < districts.length
-                                                    ? districts[field.key].seriesIndex
-                                                    : 0
+                                                    ? districts[field.key].currentSeri
+                                                    : "A"
                                             }
                                             value={
                                                 districts.length > 0 && field.key < districts.length
-                                                    ? districts[field.key].seriesIndex
-                                                    : 0
+                                                    ? districts[field.key].currentSeri
+                                                    : "A"
                                             }
                                             optionType="button"
                                             buttonStyle="solid"
                                             options={series.map((seri, index) => {
                                                 return {
                                                     label: seri,
-                                                    value: index,
+                                                    value: seri,
                                                 };
                                             })}
                                         ></Radio.Group>
